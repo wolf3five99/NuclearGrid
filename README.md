@@ -1,220 +1,144 @@
-# NuclearGrid
-
-**NuclearGrid** is a nuclear power plant simulation plugin for Minecraft Paper servers. Build a plant, operate its reactor, manage coolant and power output, connect plants into a grid, and respond to radiation incidents and meltdowns.
-
-- **Latest release:** [NuclearGrid v0.3.79](https://github.com/wolf3five99/NuclearGrid/releases/tag/v0.3.79) *(if this tag has been published)*
-- **Downloads:** [GitHub Releases](https://github.com/wolf3five99/NuclearGrid/releases)
-- **Report a bug or request a feature:** [GitHub Issues](https://github.com/wolf3five99/NuclearGrid/issues)
-
-> This repository is intended for player/server-owner documentation and downloads. It does not include the Java source code.
-
-## Table of contents
-
-- [What NuclearGrid includes](#what-nucleargrid-includes)
-- [The plant build](#the-plant-build)
-- [Reactor operation](#reactor-operation)
-- [Cooling and water intake](#cooling-and-water-intake)
-- [Power generation and reactor grids](#power-generation-and-reactor-grids)
-- [Radiation and meltdowns](#radiation-and-meltdowns)
-- [Repair and recovery](#repair-and-recovery)
-- [Commands](#commands)
-- [Installation](#installation)
-- [Permissions and configuration](#permissions-and-configuration)
-- [Troubleshooting](#troubleshooting)
-- [Compatibility and safety](#compatibility-and-safety)
-- [Support](#support)
-
-## What NuclearGrid includes
-
-NuclearGrid is designed around a physical plant players can explore and operate in-game. Its systems include:
-
-- A generated nuclear plant with reactor, control-room, turbine, cooling, and maintenance areas.
-- Reactor start, shutdown, status, inspection, and emergency SCRAM controls.
-- Temperature and coolant monitoring, with warning indicators.
-- Water intake and coolant supply systems.
-- Power output indicators and links between multiple plants.
-- Radiation hazards, boss-bar/status feedback, and decontamination mechanics.
-- Meltdown alerts, emergency response, reactor repair, and recovery workflows.
-- Protective gear and airlock areas intended to support safer movement between contaminated and protected spaces.
-
-Feature behavior can differ between releases. Check the release notes for the exact version installed on your server.
-
-## The plant build
-
-Use the in-game build command to generate the plant structure:
-
+NuclearGrid
+A nuclear power plant simulation for Paper servers. Build a full plant with one command, run the reactor from a working control room, keep it cooled and maintained, and survive the meltdown when you don't.
+NuclearGrid generates a complete, walkable nuclear plant: a reactor hall with a 5x3x5 iron core and beacon, a turbine hall with three generator sets, a control room with an airlock, a decontamination room, cooling towers and service corridors. Everything is physical. You start the reactor with a button, watch live signs, pipe in coolant with copper blocks, wire plants together with cable, and put on protective gear before you walk into a radiation zone.
+> \*\*Status:\*\* an actively developed prototype. Features are added quickly and some systems have had limited in-game testing. Run it on a test server first and report anything that behaves oddly.
+---
+Features
+A complete plant from one command
+`/nuclear build` pastes a 120 x 80 block plant at your feet. The block you stand in becomes the floor level, and the plant extends 120 blocks east and 80 blocks south.
+Reactor hall, turbine hall with three turbine-generator sets, control room with airlock, decontamination room, two cooling towers, an enclosed hallway with airlocks, and a fenced site.
+Everything is placed from a bundled blueprint, so the layout is the same every time.
+A working control room
+Six physical stone buttons: Start, Shutdown, Dashboard, SCRAM, Inspect and Grid/Turbines. Each has its own sign.
+Live signs on the wall showing reactor state, core temperature, power output, coolant and safety status, the turbine steam temperature, and a maintenance status.
+A reactor GUI (crying obsidian console, or `/nuclear gui`) showing power, temperature, coolant and steam.
+A main water-intake valve lever and a turbine shutdown lever, each with a sign reading OPEN/CLOSED or RUNNING/SHUT DOWN.
+Three redstone output pads outside the control room. Their blocks turn to redstone blocks while the plant is generating at full power and back to smooth stone when it isn't, so you can wire the output to anything.
+Cooling and water
+The reactor needs cooling water. A cauldron intake sits at the east fence of the plant.
+Water can come straight from a source block touching the cauldron, or through a continuous copper-block pipe from the cauldron to a water source (runs of 500+ blocks are supported).
+`/nuclear intake add` registers up to 32 extra remote intake stations per plant.
+The turbine room has its own water intake outside the turbine hall's east wall.
+Close the main valve and the reactor loses its automatic water supply.
+Turbines and power
+Turbine steam temperature climbs slowly from cold toward 500 C while the reactor runs and the turbine room has water. Power output rises with it, reaching 1000 MW at 500 C, and the redstone outputs switch on at full power.
+Without turbine water, with the reactor off, or in a meltdown, the steam cools and power drops with it.
+A turbine lever shuts the turbines down without stopping the reactor.
+Radiation and protective gear
+Normal operation keeps radiation inside the reactor room: high while running, low while off.
+A meltdown or explosion spreads radiation outward from the core, up to a configurable radius (default 500 blocks). It recedes after repair.
+Radiation damages and poisons players. A full set of netherite armor protects you, and a gear stand in the airlock hands it out.
+Radiation also kills mobs (configurable).
+The decontamination room clears radiation effects.
+During a meltdown or after an explosion, the control-room airlock stays locked to anyone without the full gear. Server operators are exempt.
+Maintenance
+While a reactor runs with cooling water, one random core block fails every 10 minutes. A warning sounds and the block must be replaced by hand with an iron block.
+Each missing block raises the temperature the core settles at, and makes radiation leak out of the reactor room. Replace the blocks and the temperature falls slowly and the leak recedes.
+Neglect it long enough and the core overheats into a meltdown.
+Fully configurable, or switch it off.
+Meltdown, explosion and repair
+A meltdown starts a countdown (default 30 minutes), sounds alarms, shows boss bars, and melts core blocks into lava one at a time.
+Repair it in three stages with `/nuclear repair` (water bucket, then 3 iron ingots and 2 redstone dust, then glowstone dust), or drop the whole kit into the repair chest in the control room.
+If the countdown runs out, the reactor explodes, destroying the core and part of the building. Rebuild the 5x3x5 iron core and the beacon, then put the repair parts in the chest.
+After any repair the reactor comes back off, and it cannot be restarted until the fallout has fully receded.
+Linking plants into a grid
+Each reactor has an amethyst coupler on the outside west wall of its building.
+Build a continuous copper-block cable between two couplers, then right-click each coupler to link them. Up to 5 reactors can share one grid.
+Linked reactors share start, shutdown and SCRAM, and the water-intake lever applies to the whole grid. Break the cable and the link goes inactive until it is restored.
+---
+Requirements
+	
+Server	Paper (the plugin declares `api-version: 26.3`)
+Java	25
+Optional	Essentials, Vault and LuckPerms are declared as soft dependencies. None of them is required
+Installation
+Download the latest `nuclear-grid-<version>.jar` (or build it yourself).
+Drop it into your server's `plugins/` folder.
+Start the server. A `plugins/NuclearGrid/` folder with `config.yml` is created, and plants are saved to `plants.yml` in the same folder.
+Quick start
+Go to a large, empty, flat area. The build replaces every block in its 120 x 80 footprint.
+Stand where you want the plant's north-west corner and floor level, and run `/nuclear build`.
+Walk into the control room through the airlock and press START.
+Give the reactor water: connect the cauldron at the east fence to water with copper blocks, or touch it directly to a source block. Do the same for the turbine cauldron.
+Wait for the steam to reach 500 C. The redstone outputs turn on, and you can wire redstone dust to the output pads.
+---
+Commands
+All commands are `/nuclear <subcommand>`.
+Subcommand	What it does	Permission
+`build`	Generate a plant at your location	`nucleargrid.admin`
+`status`	List registered plants and their state	`nucleargrid.status`
+`gui`	Open the reactor status GUI	`nucleargrid.admin`
+`start` / `shutdown`	Start or stop the reactor (and its grid)	`nucleargrid.admin`
+`scram`	Emergency trip and alarm	`nucleargrid.admin`
+`grid`	Turbine and grid dashboard	`nucleargrid.admin`
+`maintenance`	Inspect equipment (reactor must be off)	`nucleargrid.admin`
+`decon`	Decontaminate inside the decon room	`nucleargrid.admin`
+`intake <add|list|remove>`	Manage remote water intake stations	`nucleargrid.admin`
+`signs`	Reinstall or refresh the control-room signs	`nucleargrid.admin`
+`meltdown`	Trigger a test meltdown	`nucleargrid.admin`
+`repair`	Staged meltdown repair	`nucleargrid.repair`
+`remove`	Unregister the nearest plant (blocks are left in place)	`nucleargrid.admin`
+The physical buttons, levers and the repair chest are for players too. They need `nucleargrid.use`.
+Permissions
+Permission	Default	Allows
+`nucleargrid.use`	everyone	Operate the control-room buttons, levers, console and couplers
+`nucleargrid.status`	everyone	View plant status
+`nucleargrid.repair`	everyone	Perform emergency repairs
+`nucleargrid.admin`	operators	Build and manage plants
+Configuration
+`plugins/NuclearGrid/config.yml`. Restart the server after editing. New options are not added to an existing `config.yml` automatically, so any key you leave out uses the default shown here.
+Key	Default	Description
+`meltdown.countdown-seconds`	`1800`	Time to finish repairs before the reactor explodes
+`meltdown.core-lava`	`true`	Core blocks melt into lava during a meltdown
+`meltdown.core-lava-max-blocks`	`8`	Most core blocks that can be lava at once
+`meltdown.core-lava-interval-seconds`	`60`	Seconds between one more block melting
+`radiation.kill-mobs`	`true`	Radiation damages and kills mobs
+`radiation.max-radius`	`500`	Largest radiation radius in blocks (raise it for a bigger blast)
+`radiation.require-gear-to-exit-airlock`	`true`	Lock the control-room airlock exit without full gear during a meltdown or after an explosion
+`maintenance.enabled`	`true`	Core blocks fail over time while running with water
+`maintenance.damage-interval-minutes`	`10`	Minutes between failures
+`maintenance.temperature-per-missing-block`	`50.0`	Degrees C each missing block adds to the core's settling temperature
+`maintenance.temperature-rise-per-second`	`2.0`	How fast the core climbs to that level
+`maintenance.temperature-fall-per-second`	`0.5`	How fast it falls back after repairs
+`maintenance.overheat-meltdown`	`true`	A damaged core reaching 200 C melts down
+`maintenance.radiation-growth-per-missing-block`	`5`	Blocks of radius gained per minute per missing block
+`turbine.steam-rise-per-second`	`2.0`	Steam heating rate (about 4 minutes to 500 C)
+`turbine.steam-fall-per-second`	`1.0`	Steam cooling rate
+Control room reference
+All offsets are from the plant's origin (the corner and floor level where you ran `/nuclear build`).
+Item	Offset (X, Y, Z)
+Operator buttons (start, shutdown, dashboard, SCRAM, inspect, grid)	X 48/52/56/60/64/66, Y+2, Z+71
+Water-intake lever	44, +2, 71
+Turbine lever	67, +2, 71
+Reactor core (5x3x5 iron)	X 14-18, Y 1-3, Z 24-28
+Beacon	16, +4, 26
+Repair chest	60, +1, 64
+Reactor water intake cauldron	119, +1, 35
+Turbine water intake cauldron	69, +1, 27
+Grid coupler (amethyst)	7, +3, 27
+Redstone output pads	X 47/52/57, Y 0, Z 74-76
+Decon button	99, +2, 56
+How a typical shift goes
+Start up. Press START. The core runs, the steam begins to climb, and the signs update.
+Watch the water. If the intake loses water, the coolant drains and the core heats toward a meltdown.
+Handle maintenance. Every 10 minutes a core block fails. Replace it with an iron block before the temperature steps up and radiation starts to leak.
+If it goes wrong. Put on the netherite gear, repair the reactor, and wait for the radiation to recede before starting it again. Miss the countdown and the reactor explodes.
+Building from source
+```bash
+git clone <your-repo-url>
+cd NuclearGrid
+mvn package
 ```
-/nuclear build
+The jar is written to `target/nuclear-grid-<version>.jar`. You need JDK 25 and Maven. The project compiles against the Paper API from the PaperMC repository.
+Project layout
 ```
-
-The generated complex is designed around several connected functional areas:
-
-| Area | Purpose |
-|---|---|
-| Reactor building | Houses the reactor/core and its operating area. |
-| Control room | Provides plant monitoring and controls, including status and emergency actions. |
-| Turbine hall | Represents the plant's power-generation section. |
-| Cooling systems | Visual cooling equipment and coolant-related systems support reactor operation. |
-| Water intake | Supplies the coolant system when configured and connected correctly. |
-| Maintenance/repair area | Supports inspection, repairs, and recovery tasks. |
-| Decontamination room | Provides a designated area for radiation-related cleanup. |
-| Airlocks and connecting hallway | Connect protected areas and help separate the control/decontamination spaces from exposed areas. |
-
-The build uses a large footprint and includes structural details such as access routes, catwalks, stairs, railings, pipes, windows, warning lamps, and monitoring signs. Exact layout and block placement depend on the plugin release.
-
-**Before generating a plant:** make a world backup, ensure the target area is clear, and use the command only where you are comfortable with a large structure being placed.
-
-## Reactor operation
-
-The plant is intended to be operated through in-world controls and supported NuclearGrid commands.
-
-Typical operating tasks include:
-
-1. Inspect the plant and review the status display.
-2. Check coolant availability and the temperature indicators.
-3. Start the reactor using the available control-room controls.
-4. Monitor temperature, water level, and power output while running.
-5. Use a normal shutdown for planned stops or **SCRAM** for an emergency.
-
-Control-room panels may include start, shutdown, status, inspection, turbine, and emergency controls, depending on the release. Do not assume every control is available or working identically in every version; check the server console if an interaction fails.
-
-## Cooling and water intake
-
-Cooling is a core part of plant operation. NuclearGrid includes coolant/water-level behavior and visual indicators for water status and temperature.
-
-- Check the coolant level before operating the reactor.
-- The water-level indicator is intended to show a normal/full level and warn when water is low.
-- Temperature warning lamps indicate elevated reactor temperature.
-- The intake uses a physical pipe connection concept; copper-family blocks are used for the coolant connection system in supported builds.
-- Long-distance intake behavior and pipe scanning may vary by release. If a distant source is not detected or the water level does not recover, test the connection nearby first and review the server log.
-
-Do not assume that placing any arbitrary line of blocks will provide coolant. Follow the connection behavior implemented by the exact version you have installed.
-
-## Power generation and reactor grids
-
-NuclearGrid supports power-output monitoring and a physical method for linking plants into a grid in versions that include the grid feature.
-
-In releases using the **End Rod grid coupler**, the intended interaction is:
-
-1. Locate the coupler for the first plant.
-2. Right-click it to select the first plant.
-3. Right-click the second plant's coupler to link the two plants.
-4. Sneak-right-click a linked coupler to disconnect the link.
-
-Grid linking is intended for plants in the same world and follows the limits implemented by the installed release. Keep couplers accessible and avoid confusing them with decorative blocks. Verify the link and combined output in the in-game grid/status display.
-
-## Radiation and meltdowns
-
-A meltdown is an emergency event, not a routine operating mode. Depending on the release and configuration, incident behavior can include:
-
-- Audible and visual alarms with nearby-player alerts.
-- Radiation exposure and status/boss-bar feedback.
-- Poison or other damage effects for unprotected players in affected areas.
-- A configurable countdown before a major meltdown event.
-- An explosion that may damage blocks, followed by a persistent contaminated area.
-- Radiation spread that can be affected by water placed over the reactor core in supported versions.
-
-Protective equipment and designated control/decontamination areas are intended to help players manage exposure. These mechanics are game simulations and do not represent real-world nuclear engineering.
-
-## Repair and recovery
-
-Supported releases include reactor inspection and repair mechanics. Depending on the stage and release, recovery can involve repair materials, a bucket, redstone/iron components, glowstone dust, and a repair chest or checklist.
-
-General recovery guidance:
-
-1. Keep players away from the contaminated area and follow the in-game alerts.
-2. Use SCRAM if the reactor is still operating and the control is available.
-3. Check the inspection output or repair checklist to identify missing parts.
-4. Gather the required materials and follow the in-game repair workflow.
-5. Confirm the plant has returned to a safe state before attempting to restart it.
-
-A severe meltdown may destroy part of the physical reactor structure. Repairing the plugin's state does not necessarily rebuild destroyed blocks; the affected structure may need to be rebuilt using the supported in-game workflow. Exact repair requirements are version-dependent.
-
-## Commands
-
-The following command families have been used by NuclearGrid releases. Availability and exact syntax can vary by version.
-
-| Command | Purpose |
-|---|---|
-| `/nuclear build` | Generate a nuclear plant structure. |
-| `/nuclear maintenance` | Open or use maintenance-related functionality. |
-| `/nuclear inspect` | Inspect reactor/plant condition and repair status. |
-| `/nuclear grid` | View reactor-grid information where grid support is enabled. |
-| `/nuclear decon` | Access decontamination functionality. |
-| `/nuclear scram` | Trigger emergency shutdown functionality. |
-
-If a command is not recognized, check the installed version, the server console, and the plugin's in-game command help. Do not assume command aliases or extra arguments that are not shown by your installed release.
-
-## Installation
-
-1. Download the desired `.jar` from [GitHub Releases](https://github.com/wolf3five99/NuclearGrid/releases).
-2. Stop your Paper server.
-3. Copy the JAR into the server's `plugins/` directory.
-4. Start the server.
-5. Check the console for plugin load errors and confirm NuclearGrid is enabled.
-6. Back up the world before generating a plant or testing destructive incident behavior.
-
-To update, stop the server, replace the old NuclearGrid JAR with the new release, then start the server and review the console. Keep a backup of your world and plugin configuration before updating.
-
-## Permissions and configuration
-
-The plugin has used the following permission nodes:
-
-- `nucleargrid.use` — general use of NuclearGrid features.
-- `nucleargrid.admin` — administrative access to supported features.
-
-Exact permission requirements can differ by command and version. Use your permissions plugin and the server's plugin output to confirm access.
-
-Some releases support a configurable meltdown countdown; a documented example setting is:
-
-```yaml
-meltdown:
-  countdown-seconds: 1800
+src/main/java/com/nucleargrid/NuclearGridPlugin.java   commands, build, reactor tick, radiation, controls
+src/main/java/com/nucleargrid/PlantStore.java          plant state saved to plants.yml
+src/main/resources/nuclear-grid-blueprint.bin          the plant blueprint
+src/main/resources/plugin.yml                          commands and permissions
+src/main/resources/config.yml                          default configuration
 ```
-
-That example represents 30 minutes. Only use configuration keys present in the config file generated by your installed release; unknown settings may be ignored.
-
-## Troubleshooting
-
-**The plugin does not load**
-- Confirm the JAR is in the server's `plugins/` folder.
-- Check the console for the exact error.
-- Confirm the Paper/server version is compatible with the release.
-
-**A command or control does nothing**
-- Check that the plugin loaded successfully.
-- Confirm you have the required permission.
-- Try the supported command from the table above and inspect the console for errors.
-- Confirm you are using a release that includes that feature.
-
-**The coolant level does not rise**
-- Check the water source and physical pipe connection.
-- Test with a shorter connection first.
-- Confirm the pipe blocks and intake behavior match the installed release.
-- Review console messages for intake or plant errors.
-
-**The grid does not link or output looks wrong**
-- Confirm both plants and couplers exist and are in the same world.
-- Follow the coupler interaction sequence for your version.
-- Recheck the grid/status display after linking.
-
-**The plant or radiation area is damaged**
-- Use the in-game inspection and repair workflow where available.
-- Restore from a world backup if the structure was unintentionally damaged.
-
-## Compatibility and safety
-
-NuclearGrid is a Minecraft gameplay plugin, not a real-world nuclear simulator or safety system. Reactor behavior, radiation, coolant, and repairs are fictional game mechanics.
-
-Compatibility can change between releases. Check the release notes and server console rather than assuming a version works with every Paper build. Always test on a backup or staging server before using it on an important world.
-
-## Support
-
-- **Downloads and release notes:** [GitHub Releases](https://github.com/wolf3five99/NuclearGrid/releases)
-- **Bug reports and feature requests:** [GitHub Issues](https://github.com/wolf3five99/NuclearGrid/issues)
-
-When reporting a problem, include the NuclearGrid version, Minecraft/Paper version, relevant console errors, and the steps that reproduce the issue. Do not include private server credentials or other secrets.
-
-## License
-
-No license has been specified in this repository. Until a license is added, standard copyright restrictions apply.
+Notes
+`/nuclear build` replaces blocks in its footprint. Use an empty test area.
+`/nuclear remove` unregisters a plant but leaves its blocks in the world.
+Radiation only affects loaded chunks.
